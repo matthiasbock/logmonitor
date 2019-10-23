@@ -115,6 +115,9 @@ def evaluate(line):
 		break
 
 
+print("Setting bantime to 24h ...")
+subprocess.Popen(["fail2ban-client", "set", "exim", "bantime", str(24*60*60)]).wait()
+
 print("Monitoring {:s} ... Press Ctrl+C to cancel.".format(logfile))
 f = subprocess.Popen(
 	['tail', '-fn150', logfile],
