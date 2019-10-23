@@ -32,9 +32,29 @@ def matchRule2(line):
 		return line[a+1:b]
 	return None
 
+def matchRule3(line):
+	if line == "test":
+		return "2019-10-21 03:04:32 H=([193.32.160.150]) [193.32.160.150] F=<dkedoeyo4nrapb0k@daipra.it> rejected RCPT <aazevedo@diybio.de>: X-Host-Lookup-Failed: Reverse DNS lookup failed for 193.32.160.150 (failed)"
+	if line.find("X-Host-Lookup-Failed: Reverse DNS lookup failed") > -1:
+		a = line.find("[")
+		b = line.find("]")
+		return line[a+1:b]
+	return None
+
+def matchRule4(line):
+	if line == "test":
+		return "2019-01-23 04:01:49 SMTP protocol synchronization error (input sent without waiting for greeting): rejected connection from H=ec2-34-200-230-3.compute-1.amazonaws.com [34.200.230.3] input="
+	if line.find("SMTP protocol synchronization error (input sent without waiting for greeting)") > -1:
+		a = line.find("[")
+		b = line.find("]")
+		return line[a+1:b]
+	return None
+
 rules = [
 	matchRule1,
-	matchRule2
+	matchRule2,
+	matchRule3,
+	matchRule4
 	]
 
 #
