@@ -50,11 +50,22 @@ def matchRule4(line):
 		return line[a+1:b]
 	return None
 
+def matchRule5(line):
+	if line == "test":
+		return "2019-10-22 12:07:31 H=(k9ZsfxBuX3) [171.78.142.150] F=<webmaster@testdomain.de> rejected RCPT <uknluk09@gmail.com>: relay not permitted"
+	if (line.find("rejected RCPT") > -1) \
+	and (line.find("relay not permitted") > -1):
+		a = line.find("[")
+		b = line.find("]")
+		return line[a+1:b]
+	return None
+
 rules = [
 	matchRule1,
 	matchRule2,
 	matchRule3,
-	matchRule4
+	matchRule4,
+	matchRule5
 	]
 
 #
