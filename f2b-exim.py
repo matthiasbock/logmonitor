@@ -102,12 +102,57 @@ def log(s):
 
 
 #
+# Whitelisted IPs and hosts are not banned,
+# even if they violate one of the above rules.
+# Trusted email service providers should be whitelisted
+# in order not to ban all service users.
+#
+whitelistedIPs = [
+	"37.120.163.112",
+	"45.82.153.133"
+]
+
+def isWhitelistedIP(ip):
+	return (ip in whitelistedIPs)
+
+whitelistedHosts = [
+	"web.de",
+	"gmail.com",
+	"yahoo.com",
+	"yahoo.co.uk",
+	"interoberlin.de"
+]
+
+def getHostnameForIP(ip):
+	if (True in [(c in ip) for c in ["&", ":", ";", "|", "-", "%", "\\", "/", "\"", "'"]]):
+		return None
+	result = subprocess.Popen(["host", ip], stdout=subprocess.PIPE, encoding="utf8").communicate()[0].strip()
+	if not ("in-addr.arpa domain name pointer" in result):
+		return None
+	return result.split(" ")[4]
+
+def isWhitelistedHost(ip):
+	host = getHostnameForIP(ip)
+	if host is None:
+		return False
+	host = host.lower()
+	for wh in whitelistedHosts:
+		if host in wh.lower():
+			return True
+	return False
+
+def isWhitelisted(ip):
+	return (isWhitelistedIP(ip) or isWhitelistedHost(ip))
+
+
+#
 # Ban a certain IP from contacting our Exim again (typically for 24h)
 #
 def ban(ip):
-	if (ip == "37.120.163.112"):
-		print("Not banning whitelisted IP 37.120.163.112 (interoberlin.de).")
-		log("Not banning whitelisted IP 37.120.163.112 (interoberlin.de).")
+	if isWhitelisted(ip):
+		msg = "Not banning whitelisted IP {:s}.".format(ip)
+		print(msg)
+		log(msg)
 		return
 	print("Banning IP {:s} for 24h ...".format(ip))
 	subprocess.Popen(["fail2ban-client", "set", "exim", "banip", ip]).wait()
